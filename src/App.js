@@ -24,12 +24,15 @@ class App extends Component {
   }
   changeStart(event) {
     this.setState({start_date: event.target.value});
+    localStorage.setItem('start_date', event.target.value);
   }
   changeEnd(event) {
     this.setState({end_date: event.target.value});
+    localStorage.setItem('end_date', event.target.value);
   }
   changeToken(event) {
     this.setState({access_token: event.target.value});
+    localStorage.setItem('access_token', event.target.value);
   }
   submitQuery(event) {
     if (this.state.start_date.trim().length === 0) {
@@ -62,7 +65,11 @@ class App extends Component {
     event.preventDefault();
   }
   componentDidMount() {
-    // Load start_date, end_date, access_token
+    this.setState({
+      start_date: localStorage.getItem('start_date') || '',
+      end_date: localStorage.getItem('end_date') || '',
+      access_token: localStorage.getItem('access_token') || ''
+    });
   }
   render() {
     return (
@@ -81,6 +88,7 @@ class App extends Component {
                 <br/>
                 <input className="DateControl__input"
                        type="text"
+                       value={this.state.start_date}
                        onChange={this.changeStart}
                        placeholder="YYYY-MM-DD"
                 />
@@ -92,6 +100,7 @@ class App extends Component {
                 <br/>
                 <input className="DateControl__input"
                        type="text"
+                       value={this.state.end_date}
                        onChange={this.changeEnd}
                        placeholder="YYYY-MM-DD"
                 />
@@ -106,6 +115,7 @@ class App extends Component {
               />
               <input className="MediaObject__content"
                      type="text"
+                     value={this.state.access_token}
                      onChange={this.changeToken}
                      placeholder="Access token"
               />
