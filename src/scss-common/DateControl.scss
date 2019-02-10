@@ -1,0 +1,17 @@
+%input-control {
+  font-size: 1.1em;
+  padding: 0.36em;
+}
+
+.DateControl {
+  display: inline-block;
+  margin-right: 40px;
+  &__label {
+    color: grey;
+  }
+  &__input {
+    @extend %input-control;
+    margin: 4px;
+    width: 15em;
+  }
+}

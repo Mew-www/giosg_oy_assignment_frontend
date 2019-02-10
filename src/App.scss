@@ -1,0 +1,54 @@
+%clearfix {
+  &:after {
+    clear: both;
+    display: table;
+    content: ' ';
+  }
+}
+
+.App {
+  &__header {
+    padding: 4px;
+    padding-left: 10px;
+
+    background: rgb(26, 26, 26);
+    color: #9c9c9c;
+    font-weight: bold;
+  }
+
+  &__controls {
+    margin: 4px;
+    @extend %clearfix;
+    &-options {
+      float: left;
+      margin: 20px;
+      // contains DateControl(s), styles in DateControl.scss
+    }
+    &-auth {
+      float: right;
+      margin: 20px;
+      margin-top: 40px;
+      // styles in MediaObject.scss (this COULD have been made a component, but there's no reason to in this assignment)
+    }
+    &-submit-btn {
+      width: 10em;
+      font-size: 1em;
+      border-left: 2px solid grey;
+    }
+  }
+
+  &__error {
+    color: red;
+    font-style: italic;
+    text-align: center;
+  }
+
+  &__total-numbers {
+    margin: 4px;
+    // contains DataPanel(s), styles in DataPanel.scss
+  }
+
+  &__daily-numbers {
+    margin: 4px;
+  }
+}

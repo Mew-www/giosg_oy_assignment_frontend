@@ -1,0 +1,14 @@
+.DataPanel {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid black;
+  display: inline-block;
+  &__count {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+  }
+  &__name {
+    font-weight: bold;
+  }
+}

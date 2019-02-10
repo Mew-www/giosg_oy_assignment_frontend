@@ -1,0 +1,41 @@
+%clearfix {
+  &:after {
+    clear: both;
+    display: table;
+    content: ' ';
+  }
+}
+
+%input-control {
+  font-size: 1.1em;
+  padding: 0.36em;
+}
+
+.MediaObject {
+  @extend %clearfix;
+  &__icon {
+    float: left;
+    margin: 1px;
+    @at-root {
+      img {
+        width: 48px;
+        height: 48px;
+
+      }
+    }
+  }
+  &__content {
+    float: left;
+    margin: 1px;
+    margin-top: 2px;
+    @at-root {
+      input {
+        @extend %input-control;
+        width: 20em;
+        margin-top: 6px !important;
+        margin-left: -11px !important;
+        border-left: 2px solid black;
+      }
+    }
+  }
+}
