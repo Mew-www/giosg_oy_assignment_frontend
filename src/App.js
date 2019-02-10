@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './scss-common/DateControl.scss';
 import './scss-common/MediaObject.scss';
+import './scss-common/PagingBtn.scss';
 import './App.scss';
 import account_img from './account.svg'
 import DataPanel from "./subcomponents/DataPanel";
@@ -15,12 +16,16 @@ class App extends Component {
       access_token: '',
       error: '',
       total_numbers: null,
-      daily_numbers: null
+      daily_numbers: null,
+      paginated: false,
+      current_page: 1,
+      max_page: 1
     };
     this.changeStart = this.changeStart.bind(this);
     this.changeEnd = this.changeEnd.bind(this);
     this.changeToken = this.changeToken.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
+    this.changePage = this.changePage.bind(this);
   }
   changeStart(event) {
     this.setState({start_date: event.target.value});
@@ -49,6 +54,31 @@ class App extends Component {
       )
         .then((response) => {
           this.setState({total_numbers: response.data});
+          // Technically this SHOULD be in axios.all([]).then(axios.spread(... etc. but im running against time so nah
+          // SHOULD == it would load concurrently as opposed to (like below) sequentially, also more pretty
+          axios.get(
+            `${process.env.REACT_APP_API_ROOT}/reporting/v1/daily/from-${this.state.start_date}/to-${this.state.end_date}/`,
+            {headers: {'X-Gi-Token': this.state.access_token}}
+          )
+            .then((response2) => {
+              this.setState({
+                daily_numbers: response2.data.by_date,
+                paginated: response2.data.paginated,
+                current_page: 1, // Always initially 1st page at first
+                max_page: response2.data.max_page
+              });
+            })
+            .catch((error) => {
+              if (error.response.status === 404) {
+                this.setState({error: 'Invalid start- or end-date'});
+              } else if (error.response) {
+                this.setState({error: error.response.data});
+              } else if (error.request) {
+                this.setState({error: error.request});
+              } else {
+                this.setState({error: error.message});
+              }
+            });
         })
         .catch((error) => {
           if (error.response.status === 404) {
@@ -60,9 +90,34 @@ class App extends Component {
           } else {
             this.setState({error: error.message});
           }
-        })
+        });
     }
     event.preventDefault();
+  }
+  changePage(page_num) {
+    axios.get(
+      `${process.env.REACT_APP_API_ROOT}/reporting/v1/daily/from-${this.state.start_date}/to-${this.state.end_date}/page-${page_num}`,
+      {headers: {'X-Gi-Token': this.state.access_token}}
+    )
+      .then((response2) => {
+        this.setState({
+          daily_numbers: response2.data.by_date,
+          paginated: response2.data.paginated,
+          current_page: response2.data.current_page, // Somewhat redundant (since we have it in page_num), but to assert
+          max_page: response2.data.max_page
+        });
+      })
+      .catch((error) => {
+        if (error.response.status === 404) {
+          this.setState({error: 'Invalid start- or end-date'});
+        } else if (error.response) {
+          this.setState({error: error.response.data});
+        } else if (error.request) {
+          this.setState({error: error.request});
+        } else {
+          this.setState({error: error.message});
+        }
+      });
   }
   componentDidMount() {
     this.setState({
@@ -160,11 +215,24 @@ class App extends Component {
         {this.state.daily_numbers ?
           <div className="App__daily-numbers">
             <div>
-              daily table
+              {JSON.stringify(this.state.daily_numbers)}
             </div>
-            <div>
-              table controls (page)
-            </div>
+            {this.state.paginated ?
+              <div>
+                <p>Goto page</p>
+                {[...Array(this.state.max_page+1).keys()].slice(1).map((page_num) => (
+                  <input className="PagingBtn"
+                         key={page_num}
+                         type="button"
+                         value={page_num}
+                         onClick={(event) => {this.changePage(page_num); event.preventDefault();}}
+                         disabled={page_num === this.state.current_page}
+                  />
+                ))}
+              </div>
+              :
+              <p>"Only 1 page of results"</p>
+            }
           </div>
           :
           ""
